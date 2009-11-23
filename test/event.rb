@@ -8,7 +8,7 @@ Hibernate.dialect = Hibernate::Dialects::HSQL
 Hibernate.current_session_context_class = "thread"
 
 Hibernate.connection_driver_class = "org.hsqldb.jdbcDriver"
-Hibernate.connection_url = "jdbc:hsqldb:memory"
+Hibernate.connection_url = "jdbc:hsqldb:mem:event"
 Hibernate.connection_username = "sa"
 Hibernate.connection_password = ""
 Hibernate.properties["hbm2ddl.auto"] = "update"

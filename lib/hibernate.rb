@@ -125,7 +125,7 @@ module Hibernate
     end
 
     def hibernate_identifier(name, type)
-      add_java_property(name, type, javax.persistence.Id => {})
+      add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
 
     end
     
