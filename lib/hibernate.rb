@@ -1,18 +1,14 @@
 require 'java'
-require 'java/antlr-2.7.6.jar'
-require 'java/commons-collections-3.1.jar'
-require 'java/dom4j-1.6.1.jar'
-require 'java/javassist-3.9.0.GA.jar'
-require 'java/jta-1.1.jar'
-require 'java/slf4j-simple-1.5.8.jar'
-require 'java/slf4j-api-1.5.8.jar'
-require 'java/hibernate3.jar'
+
+Dir.glob(File.join(File.dirname(__FILE__), "java", "*.jar")).each do |jar|
+  require jar
+end
 require 'stringio'
 
 require 'dialects'
 
 module Hibernate
-  import org.hibernate.cfg.Configuration
+  import org.hibernate.cfg.AnnotationConfiguration
   import javax.xml.parsers.DocumentBuilderFactory
   import org.xml.sax.InputSource
   JClass = java.lang.Class
@@ -91,11 +87,11 @@ module Hibernate
   end
 
   def self.config
-    @config ||= Configuration.new
+    @config ||= AnnotationConfiguration.new
   end
 
-  def self.add_model(mapping)
-    config.add_xml(File.read(mapping))
+  def self.add_model(model_class)
+    config.add_annotated_class(model_class)
   end
 
   module Model
@@ -109,24 +105,36 @@ module Hibernate
       @hibernate_sigs ||= {}
     end
 
+    def add_java_property(name, type, annotation = nil)
+      attr_accessor name
+      get_name = "get#{name.to_s.capitalize}"
+      set_name = "set#{name.to_s.capitalize}"
+
+      alias_method get_name.intern, name
+      add_method_signature get_name, [TYPES[type].java_class]
+      add_method_annotation get_name, annotation if annotation
+      alias_method set_name.intern, :"#{name.to_s}="
+      add_method_signature set_name, [JVoid, TYPES[type].java_class]
+
+    end
+
     def hibernate_attr(attrs)
       attrs.each do |name, type|
-        attr_accessor name
-        get_name = "get#{name.to_s.capitalize}"
-        set_name = "set#{name.to_s.capitalize}"
-
-        alias_method get_name.intern, name
-        add_method_signature get_name, [TYPES[type].java_class]
-        alias_method set_name.intern, :"#{name.to_s}="
-        add_method_signature set_name, [JVoid, TYPES[type].java_class]
+        add_java_property(name, type)
       end
     end
 
+    def hibernate_identifier(name, type)
+      add_java_property(name, type, javax.persistence.Id => {})
+
+    end
+    
     def hibernate!
-      become_java!
+      add_class_annotation javax.persistence.Entity => {}
+      java_class = become_java!
 
 #      Hibernate.mappings.
-#      Hibernate.add_mapping reified_class,
+      Hibernate.add_model java_class
     end
   end
 end

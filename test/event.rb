@@ -15,7 +15,8 @@ Hibernate.properties["hbm2ddl.auto"] = "update"
 
 class Event
   extend Hibernate::Model
-  hibernate_attr :id => :long, :title => :string, :date => :date
+  hibernate_attr :title => :string, :date => :date
+  hibernate_identifier :id, :long
   hibernate!
 
   def initialize(params = {})
@@ -23,4 +24,5 @@ class Event
   end
 end
 
-Hibernate.add_model File.join(File.dirname(__FILE__), "Event.hbm.xml")
+#Hibernate.add_model Event
+#Hibernate.add_model java.lang.Class.for_name("ruby.Event")
