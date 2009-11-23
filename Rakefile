@@ -10,7 +10,6 @@ begin
     gem.email = "me@christophernelsonconsulting.com"
     gem.homepage = "http://github.com/superchris/hibernate"
     gem.authors = ["Chris Nelson"]
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
